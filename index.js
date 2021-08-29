@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const consoleTable = require('console.table');
+const { allowedNodeEnvironmentFlags } = require('process');
 
 // Connect to mysql database
 const db = mysql.createConnection(
@@ -30,8 +31,8 @@ function start() {
         .prompt([
             {
                 type: 'list',
-                message: 'What would you like to do?',
-                name: 'Option',
+                message: 'You are connected to the employee database, What would you like to do?',
+                name: 'option',
                 options: [
                     'View All Employees?',
                     'Add Employees?',
@@ -43,5 +44,31 @@ function start() {
                     'Exit',
                 ],
             },
-        ])
+        ]) .then(value => {
+            switch (value.option) {
+                case 'View all employees?':
+                    viewEmployees();
+                break;
+                case 'Add Employee?':
+                    addEmployee();
+                break;
+                case 'Update Employee Role?':
+                    updateEmployeeRole();
+                break;
+                case 'View all Roles?':
+                    viewAllRoles();
+                break;
+                case 'Add Role?':
+                    addRole();
+                case 'View all Departments?':
+                    viewDepartments();
+                break;
+                case 'Add Department':
+                    addDepartment();
+                case 'Exit':
+                    db.end();
+                    console.log('Thanks!');
+                    break;
+            }
+        });
 }
