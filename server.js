@@ -124,3 +124,29 @@ function viewAllDepartments() {
     }
   )
 }
+
+function addDepartment() {
+
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'department',
+        message: 'Add Department:'
+      }
+    ])
+    .then(results => {
+      db.query(
+        "INSERT INTO department SET ?",
+        {
+         name: results.department,
+        },
+        (err, results) => {
+          if(err) 
+          throw err;
+          console.log("Department added");
+          start();
+        }
+      )
+    })
+}
