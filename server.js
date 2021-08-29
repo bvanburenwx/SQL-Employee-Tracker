@@ -47,9 +47,9 @@ function start() {
         ],
       },
     ])
-    .then(value => {
-      switch (value.choice) {
-        case "View all employees?":
+    .then(val => {
+      switch (val.choice) {
+        case "View all Employees?":
           viewAllEmployees();
           break;
 
@@ -70,7 +70,7 @@ function start() {
           break;
 
         case "View all Departments?":
-          viewDepartments();
+          viewAllDepartments();
           break;
 
         case "Add Department":
@@ -92,8 +92,36 @@ function viewAllEmployees() {
       if (err) {
         throw err;
       }
-      consoleTable(results);
+      console.table(results);
       start();
     }
   );
 }
+
+function viewAllRoles() {
+  var roles = db.query(
+    "SELECT role.id, role.title, role.salary FROM role",
+    (err, results) => {
+      if(err) {
+        throw err;
+      }
+      console.table(results);
+      start();
+    })
+    console.log(roles);
+}
+
+function viewAllDepartments() {
+  db.query(
+    "SELECT department.id, department.name AS 'Department Name' FROM department",
+    (err, results) => {
+      if(err) {
+        throw err;
+      }
+      console.table(results);
+      start();
+    }
+  )
+}
+
+console.log(viewAllDepartments());
