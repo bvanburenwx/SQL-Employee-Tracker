@@ -14,3 +14,11 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to the employee_db database`)
 );
+
+// Throw an error if the database is not connected 
+db.connect(err => {
+    if(err) {
+        throw err;
+    }
+    console.log("Your database is now connected");
+});
