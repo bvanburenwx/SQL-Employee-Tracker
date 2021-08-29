@@ -1,0 +1,24 @@
+{
+  "name": "sql-employee-tracker",
+  "version": "1.0.0",
+  "description": "Tracking Employees",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bvanburenwx/SQL-Employee-Tracker.git"
+  },
+  "author": "Cody Van Buren",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.1.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.0"
+  },
+  "bugs": {
+    "url": "https://github.com/bvanburenwx/SQL-Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/bvanburenwx/SQL-Employee-Tracker#readme"
+}
