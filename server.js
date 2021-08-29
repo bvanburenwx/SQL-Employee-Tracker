@@ -26,30 +26,31 @@ db.connect((err) => {
   start();
 });
 
+
 // Use inquirer to set up the original prompt questions function
 function start() {
   inquirer
     .prompt([
       {
         type: "list",
-        message:
-          "You are connected to the employee database, What would you like to do?",
+        message: "What would you like to do?",
         name: "choice",
         choices: [
           "View All Employees?",
-          "Add Employees?",
-          "Update Employee Role?",
+          "Add Employee?",
+          "Update Employee Role",
           "View All Roles?",
           "Add Role?",
-          "View All Departments?",
+          "View all Departments",
           "Add Department?",
           "Exit",
         ],
       },
     ])
-    .then(val => {
-      switch (val.choice) {
-        case "View all Employees?":
+    .then(value => {
+      // check if the question matches then call the function
+      switch (value.choice) {
+        case "View All Employees?":
           viewAllEmployees();
           break;
 
@@ -57,11 +58,11 @@ function start() {
           addEmployee();
           break;
 
-        case "Update Employee Role?":
+        case "Update Employee Role":
           updateEmployeeRole();
           break;
 
-        case "View all Roles?":
+        case "View All Roles?":
           viewAllRoles();
           break;
 
@@ -69,17 +70,17 @@ function start() {
           addRole();
           break;
 
-        case "View all Departments?":
+        case "View all Departments":
           viewAllDepartments();
           break;
 
-        case "Add Department":
+        case "Add Department?":
           addDepartment();
           break;
-          
+        // added Exit function
         case "Exit":
           db.end();
-          console.log("Thanks!");
+          console.log("Bye");
           break;
       }
     });
@@ -123,5 +124,3 @@ function viewAllDepartments() {
     }
   )
 }
-
-console.log(viewAllDepartments());

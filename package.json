@@ -13,10 +13,11 @@
   "author": "Cody Van Buren",
   "license": "ISC",
   "dependencies": {
+    "console.table": "^0.10.0",
     "inquirer": "^8.1.2",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.0",
-    "console.table": "^0.10.0"
+    "promise": "^8.1.0"
   },
   "bugs": {
     "url": "https://github.com/bvanburenwx/SQL-Employee-Tracker/issues"
