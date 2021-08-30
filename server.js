@@ -134,7 +134,15 @@ function addDepartment() {
         type: "input",
         name: "department",
         message: "Add Department:",
+        validate: function (input) {
+          if (input === "") {
+            console.log("Please enter a department");
+            return false;
+          } else {
+            return true;
+          }
       },
+    }
     ])
     .then((results) => {
       db.query(
