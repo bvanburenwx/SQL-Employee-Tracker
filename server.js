@@ -1,21 +1,23 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
+const promiseMysql = require("promise-mysql");
 const { allowedNodeEnvironmentFlags } = require("process");
+const { type } = require("os");
+const { connect } = require("http2");
 
 // Connect to mysql database
-const db = mysql.createConnection(
-  {
-    host: "localhost",
-    // MySQL username
-    user: "root",
-    // MySQL password
-    password: "password",
-    database: "employee_db",
-    port: 3306,
-  },
-  console.log(`Connected to the employee_db database`)
-);
+const connectionInfo = {
+  host: "localhost",
+  // MySQL username
+  user: "root",
+  // MySQL password
+  password: "password",
+  database: "employee_db",
+  port: 3306,
+};
+
+const db = mysql.createConnection(connectionInfo);
 
 // Throw an error if the database is not connected
 db.connect((err) => {
@@ -25,7 +27,6 @@ db.connect((err) => {
   console.log("Your database is now connected");
   start();
 });
-
 
 // Use inquirer to set up the original prompt questions function
 function start() {
@@ -47,7 +48,7 @@ function start() {
         ],
       },
     ])
-    .then(value => {
+    .then((value) => {
       // check if the question matches then call the function
       switch (value.choice) {
         case "View All Employees?":
@@ -103,49 +104,122 @@ function viewAllRoles() {
   db.query(
     "SELECT role.id, role.title, role.salary FROM role",
     (err, results) => {
-      if(err) {
+      if (err) {
         throw err;
       }
       console.table(results);
       start();
-    })
+    }
+  );
 }
 
 function viewAllDepartments() {
   db.query(
     "SELECT department.id, department.name AS 'Department Name' FROM department",
     (err, results) => {
-      if(err) {
+      if (err) {
         throw err;
       }
       console.table(results);
       start();
     }
-  )
+  );
 }
 
 function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "department",
+        message: "Add Department:",
+      },
+    ])
+    .then((results) => {
+      db.query(
+        "INSERT INTO department SET ?",
+        {
+          name: results.department,
+        },
+        (err, results) => {
+          if (err) throw err;
+          console.log("Department added");
+          start();
+        }
+      );
+    });
+}
+
+function addEmployee() {
+  var managerArr = [];
+  var empRoleArr = [];
+
+  db.query(
+    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL",
+    (err, results) => {
+      results.map((manager) =>
+        managerArr.push(`${manager.first_name} ${manager.last_name}`)
+      );
+      return managerArr;
+    }
+  );
+
+  db.query("SELECT * FROM role ", (err, results) => {
+    if (err) throw err;
+    results.map((role) => empRoleArr.push(`${role.title}`));
+    return empRoleArr;
+  });
 
   inquirer
     .prompt([
       {
-        type: 'input',
-        name: 'department',
-        message: 'Add Department:'
-      }
+        name: "first_name",
+        type: "input",
+        message: "What is the employee's first name?",
+      },
+      {
+        name: "last_name",
+        type: "input",
+        message: "What is the employee's last name?",
+      },
+      {
+        type: "list",
+        name: "currentRole",
+        message: "What is the employees role",
+        choices: empRoleArr,
+      },
+      {
+        type: "list",
+        name: "manager",
+        message: "What is the name of the employees manager?",
+        choices: managerArr,
+      },
     ])
-    .then(results => {
+    .then((value => {
+      const role_id = empRoleArr.indexOf(value.role) + 1;
+      var manager_id = managerArr.indexOf(value.manager) + 1;
+
+      const newEmployee = {
+        first_name: value.first_name,
+        last_name: value.last_name,
+        manager_id: manager_id,
+        role_id: role_id,
+      };
+
       db.query(
-        "INSERT INTO department SET ?",
+        "INSERT INTO employee SET ?",
         {
-         name: results.department,
+          first_name: value.firstname,
+          last_name: value.lastname,
+          role_id: role_id,
+          manager_id: manager_id,
         },
         (err, results) => {
-          if(err) 
-          throw err;
-          console.log("Department added");
+          if (err) throw err;
+          console.log("Employee added");
           start();
         }
-      )
+      );
     })
+  );
 }
