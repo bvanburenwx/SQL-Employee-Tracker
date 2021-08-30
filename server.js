@@ -310,3 +310,17 @@ function addRole () {
       }))
   })
 }
+
+function updateEmployeeRole () {
+  var emplArr = [];
+  var roleArr = [];
+
+  promiseMysql.createConnection(connectionInfo)
+  .then(connect => {
+    return Promise.all([
+      connect.query("Select id, title FROM role ORDER BY title ASC"),
+      connect.query("SELECT employee.id, concat(employee.first_name, ' ' , employee.last_name) AS Employee FROM employee ORDER by Employee ASC"
+      ),
+    ])
+  })
+}
