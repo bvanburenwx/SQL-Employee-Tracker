@@ -100,7 +100,7 @@ function viewAllEmployees() {
 }
 
 function viewAllRoles() {
-  var roles = db.query(
+  db.query(
     "SELECT role.id, role.title, role.salary FROM role",
     (err, results) => {
       if(err) {
@@ -109,7 +109,6 @@ function viewAllRoles() {
       console.table(results);
       start();
     })
-    console.log(roles);
 }
 
 function viewAllDepartments() {
