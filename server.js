@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
-const promiseMysql = require("promise-mysql");
+const promiseMysql = require('mysql2/promise');
 const { allowedNodeEnvironmentFlags } = require("process");
 const { type } = require("os");
 const { connect } = require("http2");
@@ -12,8 +12,9 @@ const connectionInfo = {
   // MySQL username
   user: "root",
   // MySQL password
-  password: "password",
+  password: "",
   database: "employee_db",
+  insecureAuth: true,
   port: 3306,
 };
 
@@ -312,15 +313,58 @@ function addRole () {
 }
 
 function updateEmployeeRole () {
-  var emplArr = [];
-  var roleArr = [];
+	// Select Employee to update
+	let employees = [];
+	db.query(
+		`SELECT id, first_name, last_name
+  FROM employee`,
+		(err, res) => {
+			if (err) throw err;
 
-  promiseMysql.createConnection(connectionInfo)
-  .then(connect => {
-    return Promise.all([
-      connect.query("Select id, title FROM role ORDER BY title ASC"),
-      connect.query("SELECT employee.id, concat(employee.first_name, ' ' , employee.last_name) AS Employee FROM employee ORDER by Employee ASC"
-      ),
-    ])
-  })
-}
+			res.forEach((element) => {
+				employees.push(
+					`${element.id} ${element.first_name} ${element.last_name}`,
+				);
+			});
+			// Select employee's new role
+			let job = [];
+			db.query(`SELECT id, title FROM role`, (err, res) => {
+				if (err) throw err;
+
+				res.forEach((element) => {
+					job.push(`${element.id} ${element.title}`);
+				});
+
+				inquirer.prompt([
+          {
+          name: "update",
+          type: "list",
+          message: "Choose the employee whose role is to be updated:",
+          choices: employees,
+        },
+        // Select Employee's New Role
+        {
+          name: "role",
+          type: "list",
+          message: "Choose employee's job position",
+          choices: job,
+        },
+      ])
+    
+    .then((response) => {
+					// Update Employee with Chosen Role
+					let idCode = parseInt(response.update);
+					let roleCode = parseInt(response.role);
+					db.query(
+						`UPDATE employee SET role_id = ${roleCode} WHERE id = ${idCode}`,
+						(err, res) => {
+							if (err) throw err;
+							console.log("Employee role updated")
+							start();
+						},
+					);
+				});
+			});
+		},
+	);
+};
