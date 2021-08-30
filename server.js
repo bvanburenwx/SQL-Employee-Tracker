@@ -184,8 +184,8 @@ function addEmployee() {
       },
       {
         type: "list",
-        name: "currentRole",
-        message: "What is the employees role",
+        name: "role",
+        message: "What is the employee's role",
         choices: empRoleArr,
       },
       {
@@ -195,26 +195,21 @@ function addEmployee() {
         choices: managerArr,
       },
     ])
-    .then((value => {
-      const role_id = empRoleArr.indexOf(value.role) + 1;
-      var manager_id = managerArr.indexOf(value.manager) + 1;
+    .then((results => {
+      const role_id = empRoleArr.indexOf(results.role) + 1;
+      const manager_id = managerArr.indexOf(results.manager) + 1;
 
       const newEmployee = {
-        first_name: value.first_name,
-        last_name: value.last_name,
+        first_name: results.first_name,
+        last_name: results.last_name,
         manager_id: manager_id,
         role_id: role_id,
       };
 
       db.query(
         "INSERT INTO employee SET ?",
-        {
-          first_name: value.firstname,
-          last_name: value.lastname,
-          role_id: role_id,
-          manager_id: manager_id,
-        },
-        (err, results) => {
+        newEmployee, 
+        err => {
           if (err) throw err;
           console.log("Employee added");
           start();
