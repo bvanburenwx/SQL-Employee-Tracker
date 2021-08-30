@@ -176,11 +176,29 @@ function addEmployee() {
         name: "first_name",
         type: "input",
         message: "What is the employee's first name?",
+        validate: function(input){
+          if (input === ""){
+              console.log("Employee's first name is required");
+              return false;
+          }
+          else{
+              return true;
+          }
+      }
       },
       {
         name: "last_name",
         type: "input",
         message: "What is the employee's last name?",
+        validate: function(input){
+          if (input === ""){
+              console.log("Employee's last name is required");
+              return false;
+          }
+          else{
+              return true;
+          }
+      }
       },
       {
         type: "list",
@@ -217,4 +235,78 @@ function addEmployee() {
       );
     })
   );
+}
+
+function addRole () {
+  db.query('SELECT * FROM department', (err, results) => {
+    if(err)
+    throw err;
+
+    inquirer
+      .prompt([
+          {
+          name: 'new_role',
+          type: 'input',
+          message: 'Please enter the role to be added',
+          validate: function(input){
+            if (input === ""){
+                console.log("Name of role is required");
+                return false;
+            }
+            else{
+                return true;
+            }
+          }
+        },
+        {
+          name: 'salary',
+          type: 'input',
+          message: 'What is the salary of this role? (Enter number)',
+          validate: function(input){
+            if (isNaN(input) === false){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+      },
+        {
+          name: 'Department',
+          type: 'list',
+          choices: function() {
+            var departmentArr = [];
+            for(let i = 0; i < results.length; i++) {
+              departmentArr.push(results[i].name);
+            }
+            return departmentArr;
+          },
+        }
+      ]) .then ((input => {
+        let department_id;
+        for (let j = 0; j < input.length; j++) {
+          if(results[j].name === input.Department) {
+            department_id = results[j].id;
+          }
+        }
+        
+        const newRole = {
+          title: input.new_role,
+          salary: input.salary,
+          department_id: department_id
+        };
+        
+
+        db.query(
+          "INSERT INTO role SET ?",
+          newRole,
+          err => {
+            if(err)
+            throw err;
+            console.log('New Role Succesfully added');
+            start();
+          }
+        )
+      }))
+  })
 }
